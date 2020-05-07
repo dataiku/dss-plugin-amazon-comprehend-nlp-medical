@@ -18,7 +18,7 @@ from dataiku.customrecipe import (
     get_input_names_for_role,
     get_output_names_for_role,
 )
-from api_formatting import get_client
+from api_formatting import get_client, MedicalEntityTypeEnum, MedicalEntityAPIFormatter
 
 
 # ==============================================================================
@@ -31,7 +31,9 @@ api_quota_period = api_configuration_preset.get("api_quota_period")
 parallel_workers = api_configuration_preset.get("parallel_workers")
 batch_size = api_configuration_preset.get("batch_size")
 text_column = get_recipe_config().get("text_column")
-entity_types = [EntityTypeEnum[i] for i in get_recipe_config().get("entity_types", [])]
+entity_types = [
+    MedicalEntityTypeEnum[i] for i in get_recipe_config().get("entity_types", [])
+]
 error_handling = ErrorHandlingEnum[get_recipe_config().get("error_handling")]
 
 input_dataset_name = get_input_names_for_role("input_dataset")[0]
@@ -73,4 +75,17 @@ df = api_parallelizer(
     column_prefix=column_prefix,
 )
 
-output_dataset.write_with_schema(df)
+api_formatter = MedicalEntityAPIFormatter(
+    input_df=input_df,
+    entity_types=entity_types,
+    column_prefix=column_prefix,
+    error_handling=error_handling,
+)
+output_df = api_formatter.format_df(df)
+
+output_dataset.write_with_schema(output_df)
+set_column_description(
+    input_dataset=input_dataset,
+    output_dataset=output_dataset,
+    column_description_dict=api_formatter.column_description_dict,
+)

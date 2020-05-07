@@ -84,52 +84,40 @@
             "label": "Entity types",
             "type": "MULTISELECT",
             "visibilityCondition": "model.expert == true",
-            "description": "List of entity types to extract",
+            "description": "List of medical entity types to extract",
             "mandatory": true,
             "selectChoices": [
                 {
-                    "value": "COMMERCIAL_ITEM",
-                    "label": "Commercial item"
+                    "value": "ANATOMY",
+                    "label": "Anatomy"
                 },
                 {
-                    "value": "DATE",
-                    "label": "Date"
+                    "value": "MEDICAL_CONDITION",
+                    "label": "Medical condition"
                 },
                 {
-                    "value": "EVENT",
-                    "label": "Event"
+                    "value": "MEDICATION",
+                    "label": "Medication"
                 },
                 {
-                    "value": "LOCATION",
-                    "label": "Location"
+                    "value": "PROTECTED_HEALTH_INFORMATION",
+                    "label": "Protected health information"
                 },
                 {
-                    "value": "ORGANIZATION",
-                    "label": "Organization"
+                    "value": "TEST_TREATMENT_PROCEDURE",
+                    "label": "Test treatment procedure"
                 },
                 {
-                    "value": "OTHER",
-                    "label": "Other"
-                },
-                {
-                    "value": "PERSON",
-                    "label": "Person"
-                },
-                {
-                    "value": "QUANTITY",
-                    "label": "Quantity"
-                },
-                {
-                    "value": "TITLE",
-                    "label": "Title"
+                    "value": "TIME_EXPRESSION",
+                    "label": "Time expression"
                 }
             ],
             "defaultValue": [
-                "COMMERCIAL_ITEM",
-                "EVENT",
-                "LOCATION",
-                "ORGANIZATION",
-                "PERSON"
+                "ANATOMY",
+                "MEDICAL_CONDITION",
+                "MEDICATION",
+                "TEST_TREATMENT_PROCEDURE",
+                "TIME_EXPRESSION"
             ]
         },
         {

@@ -133,23 +133,23 @@ class MedicalPhiAPIFormatter:
         return df
 
 
-class KeyPhraseExtractionAPIFormatter:
+class MedicalEntityAPIFormatter:
     """
-    Formatter class for Key Phrase Extraction API responses:
+    Formatter class for Medical Entity Recognition API responses:
     - make sure response is valid JSON
-    - extract a given number of key phrases
+    - expand results to multiple columns
     - compute column descriptions
     """
 
     def __init__(
         self,
         input_df: pd.DataFrame,
-        num_key_phrases: int,
-        column_prefix: AnyStr = "keyphrase_api",
+        entity_types: List,
+        column_prefix: AnyStr = "medical_entity_api",
         error_handling: ErrorHandlingEnum = ErrorHandlingEnum.LOG,
     ):
         self.input_df = input_df
-        self.num_key_phrases = num_key_phrases
+        self.entity_types = entity_types
         self.column_prefix = column_prefix
         self.error_handling = error_handling
         self.api_column_names = build_unique_column_names(input_df, column_prefix)
@@ -160,46 +160,36 @@ class KeyPhraseExtractionAPIFormatter:
             v: API_COLUMN_NAMES_DESCRIPTION_DICT[k]
             for k, v in self.api_column_names._asdict().items()
         }
-        for n in range(self.num_key_phrases):
-            keyphrase_column = generate_unique(
-                "keyphrase_" + str(n + 1) + "_text",
-                self.input_df.keys(),
-                self.column_prefix,
-            )
-            confidence_column = generate_unique(
-                "keyphrase_" + str(n + 1) + "_confidence",
+        for entity_enum in MedicalEntityTypeEnum:
+            entity_type_column = generate_unique(
+                "entity_type_" + str(entity_enum.value).lower() + "_text",
                 self.input_df.keys(),
                 self.column_prefix,
             )
             column_description_dict[
-                keyphrase_column
-            ] = "Keyphrase {} extracted by the API".format(str(n + 1))
-            column_description_dict[
-                confidence_column
-            ] = "Confidence score in Keyphrase {} from 0 to 1".format(str(n + 1))
+                entity_type_column
+            ] = "List of '{}' medical entities extracted by the API".format(
+                str(entity_enum.value)
+            )
         return column_description_dict
 
     def format_row(self, row: Dict) -> Dict:
         raw_response = row[self.api_column_names.response]
         response = safe_json_loads(raw_response, self.error_handling)
-        key_phrases = sorted(
-            response.get("KeyPhrases", []), key=lambda x: x.get("Score"), reverse=True
-        )
-        for n in range(self.num_key_phrases):
-            keyphrase_column = generate_unique(
-                "keyphrase_" + str(n + 1) + "_text", row.keys(), self.column_prefix
-            )
-            confidence_column = generate_unique(
-                "keyphrase_" + str(n + 1) + "_confidence",
+        entities = response.get("Entities", [])
+        for entity_enum in MedicalEntityTypeEnum:
+            entity_type_column = generate_unique(
+                "entity_type_" + str(entity_enum.value).lower() + "_text",
                 row.keys(),
                 self.column_prefix,
             )
-            if len(key_phrases) > n:
-                row[keyphrase_column] = key_phrases[n].get("Text", "")
-                row[confidence_column] = key_phrases[n].get("Score")
-            else:
-                row[keyphrase_column] = ""
-                row[confidence_column] = None
+            row[entity_type_column] = [
+                e.get("Text", "")
+                for e in entities
+                if e.get("Category", "") == entity_enum.name
+            ]
+            if len(row[entity_type_column]) == 0:
+                row[entity_type_column] = ""
         return row
 
     def format_df(self, df: pd.DataFrame) -> pd.DataFrame:
