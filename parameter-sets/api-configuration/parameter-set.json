@@ -1,0 +1,88 @@
+{
+    "meta": {
+        "label": "API configuration",
+        "description": "Define presets for users to call the API with specific credentials, quota and parallelization parameters",
+        "icon": "icon-amazon-comprehend icon-cloud"
+    },
+    "defaultDefinableAtProjectLevel": true,
+    "defaultDefinableInline": false,
+    "params": [
+        {
+            "name": "separator_authentication",
+            "label": "Authentication",
+            "description": "Please refer to the AWS documentation: https://boto3.amazonaws.com/v1/documentation/api/latest/guide/configuration.html.",
+            "type": "SEPARATOR"
+        },
+        {
+            "name": "aws_access_key",
+            "label": "AWS access key ID",
+            "description": "If empty, attempts to ascertain credentials from the environment.",
+            "type": "STRING",
+            "mandatory": false
+        },
+        {
+            "name": "aws_secret_key",
+            "label": "AWS secret access key",
+            "description": "If empty, attempts to ascertain credentials from the environment.",
+            "type": "PASSWORD",
+            "mandatory": false
+        },
+        {
+            "name": "aws_region",
+            "label": "AWS region",
+            "description": "If empty, attempts to ascertain region name from the environment.",
+            "type": "STRING",
+            "mandatory": false,
+            "defaultValue": "us-east-1"
+        },
+        {
+            "name": "separator_api_quota",
+            "label": "API quota",
+            "type": "SEPARATOR",
+            "description": "Throttling to stay within the quota defined by AWS: https://docs.aws.amazon.com/comprehend/latest/dg/guidelines-and-limits.html"
+        },
+        {
+            "name": "api_quota_period",
+            "label": "Period",
+            "description": "Reset period of the quota in seconds. Defined by AWS.",
+            "type": "INT",
+            "mandatory": true,
+            "defaultValue": 1,
+            "minI": 1
+        },
+        {
+            "name": "api_quota_rate_limit",
+            "label": "Rate limit",
+            "description": "Maximum number of requests per period for one DSS activity. Reduce for concurrent activities.",
+            "type": "INT",
+            "mandatory": true,
+            "defaultValue": 10,
+            "minI": 1
+        },
+        {
+            "name": "separator_performance",
+            "label": "Parallelization",
+            "type": "SEPARATOR"
+        },
+        {
+            "name": "batch_size",
+            "label": "Batch size",
+            "description": "Number of rows to send to the API in batch (maximum 25). Increase to speed-up computation within the quota defined above.",
+            "type": "INT",
+            "mandatory": true,
+            "defaultValue": 10,
+            "minI": 1,
+            "maxI": 25
+        },
+        {
+            "name": "parallel_workers",
+            "label": "Concurrency",
+            "description": "Number of threads calling the API in parallel (maximum 100). Increase to speed-up computation within the quota defined above.",
+            "type": "INT",
+            "mandatory": true,
+            "defaultValue": 4,
+            "minI": 1,
+            "maxI": 100
+        }
+    ]
+}

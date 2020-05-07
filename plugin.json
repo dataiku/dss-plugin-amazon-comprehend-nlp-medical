@@ -1,0 +1,19 @@
+{
+    "id": "amazon-comprehend-medical",
+    "version": "1.0.0",
+    "meta": {
+        "label": "Amazon Comprehend Medical",
+        "category": "Natural Language Processing",
+        "description": "Use Amazon Comprehend Medical APIs to extract Protected Health Information and Medical Named Entities from medical text records",
+        "author": "Dataiku (Alex COMBESSIE)",
+        "icon": "icon-amazon-comprehend icon-cloud",
+        "licenseInfo": "Apache Software License",
+        "url": "https://www.dataiku.com/dss/plugins/info/amazon-comprehend-nlp.html",
+        "tags": [
+            "AWS",
+            "Cloud",
+            "NLP"
+        ],
+        "supportLevel": "TIER2_SUPPORT"
+    }
+}
