@@ -1,12 +1,11 @@
 {
     "meta": {
-        "label": "Named Entity Recognition",
-        "description": "Recognize “real-world objects” (people names, dates, places, etc.) in a text",
+        "label": "Medical Entity Recognition",
+        "description": "Recognize Medical Entities (medical condition, treatment, etc.) in a medical text record",
         "icon": "icon-amazon-comprehend icon-cloud",
-        "displayOrderRank": 3
+        "displayOrderRank": 2
     },
     "kind": "PYTHON",
-    "selectableFromDataset": "input_dataset",
     "inputRoles": [
         {
             "name": "input_dataset",
@@ -46,75 +45,16 @@
         {
             "name": "language",
             "label": "Language",
-            "description": "List of supported languages",
+            "description": "Only supported language",
             "type": "SELECT",
             "mandatory": true,
             "selectChoices": [
                 {
-                    "value": "language_column",
-                    "label": "Detected language column"
-                },
-                {
-                    "value": "ar",
-                    "label": "Arabic"
-                },
-                {
-                    "value": "zh",
-                    "label": "Chinese (Simplified)"
-                },
-                {
-                    "value": "zh-TW",
-                    "label": "Chinese (Traditional)"
-                },
-                {
                     "value": "en",
                     "label": "English"
-                },
-                {
-                    "value": "fr",
-                    "label": "French"
-                },
-                {
-                    "value": "de",
-                    "label": "German"
-                },
-                {
-                    "value": "hi",
-                    "label": "Hindi"
-                },
-                {
-                    "value": "it",
-                    "label": "Italian"
-                },
-                {
-                    "value": "ja",
-                    "label": "Japanese"
-                },
-                {
-                    "value": "ko",
-                    "label": "Korean"
-                },
-                {
-                    "value": "pt",
-                    "label": "Portuguese"
-                },
-                {
-                    "value": "es",
-                    "label": "Spanish"
                 }
             ],
             "defaultValue": "en"
-        },
-        {
-            "name": "language_column",
-            "label": "Language column",
-            "type": "COLUMN",
-            "columnRole": "input_dataset",
-            "mandatory": false,
-            "allowedColumnTypes": [
-                "string"
-            ],
-            "visibilityCondition": "model.language == 'language_column'"
         },
         {
             "name": "separator_configuration",

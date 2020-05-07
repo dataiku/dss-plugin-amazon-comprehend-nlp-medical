@@ -1,12 +1,11 @@
 {
     "meta": {
-        "label": "Named Entity Recognition",
-        "description": "Recognize “real-world objects” (people names, dates, places, etc.) in a text",
+        "label": "Protected Health Information Extraction",
+        "description": "Extract Protected Health Information (PHI) in a medical text record",
         "icon": "icon-amazon-comprehend icon-cloud",
-        "displayOrderRank": 3
+        "displayOrderRank": 1
     },
     "kind": "PYTHON",
-    "selectableFromDataset": "input_dataset",
     "inputRoles": [
         {
             "name": "input_dataset",
@@ -46,75 +45,16 @@
         {
             "name": "language",
             "label": "Language",
-            "description": "List of supported languages",
+            "description": "Only supported language",
             "type": "SELECT",
             "mandatory": true,
             "selectChoices": [
                 {
-                    "value": "language_column",
-                    "label": "Detected language column"
-                },
-                {
-                    "value": "ar",
-                    "label": "Arabic"
-                },
-                {
-                    "value": "zh",
-                    "label": "Chinese (Simplified)"
-                },
-                {
-                    "value": "zh-TW",
-                    "label": "Chinese (Traditional)"
-                },
-                {
                     "value": "en",
                     "label": "English"
-                },
-                {
-                    "value": "fr",
-                    "label": "French"
-                },
-                {
-                    "value": "de",
-                    "label": "German"
-                },
-                {
-                    "value": "hi",
-                    "label": "Hindi"
-                },
-                {
-                    "value": "it",
-                    "label": "Italian"
-                },
-                {
-                    "value": "ja",
-                    "label": "Japanese"
-                },
-                {
-                    "value": "ko",
-                    "label": "Korean"
-                },
-                {
-                    "value": "pt",
-                    "label": "Portuguese"
-                },
-                {
-                    "value": "es",
-                    "label": "Spanish"
                 }
             ],
             "defaultValue": "en"
-        },
-        {
-            "name": "language_column",
-            "label": "Language column",
-            "type": "COLUMN",
-            "columnRole": "input_dataset",
-            "mandatory": false,
-            "allowedColumnTypes": [
-                "string"
-            ],
-            "visibilityCondition": "model.language == 'language_column'"
         },
         {
             "name": "separator_configuration",
@@ -138,59 +78,6 @@
             "label": "Expert mode",
             "type": "BOOLEAN",
             "defaultValue": false
-        },
-        {
-            "name": "entity_types",
-            "label": "Entity types",
-            "type": "MULTISELECT",
-            "visibilityCondition": "model.expert == true",
-            "description": "List of entity types to extract",
-            "mandatory": true,
-            "selectChoices": [
-                {
-                    "value": "COMMERCIAL_ITEM",
-                    "label": "Commercial item"
-                },
-                {
-                    "value": "DATE",
-                    "label": "Date"
-                },
-                {
-                    "value": "EVENT",
-                    "label": "Event"
-                },
-                {
-                    "value": "LOCATION",
-                    "label": "Location"
-                },
-                {
-                    "value": "ORGANIZATION",
-                    "label": "Organization"
-                },
-                {
-                    "value": "OTHER",
-                    "label": "Other"
-                },
-                {
-                    "value": "PERSON",
-                    "label": "Person"
-                },
-                {
-                    "value": "QUANTITY",
-                    "label": "Quantity"
-                },
-                {
-                    "value": "TITLE",
-                    "label": "Title"
-                }
-            ],
-            "defaultValue": [
-                "COMMERCIAL_ITEM",
-                "EVENT",
-                "LOCATION",
-                "ORGANIZATION",
-                "PERSON"
-            ]
         },
         {
             "name": "error_handling",

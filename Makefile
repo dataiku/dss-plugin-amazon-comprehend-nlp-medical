@@ -1,8 +1,42 @@
-PLUGIN_VERSION=1.0.0
-PLUGIN_ID=amazon-comprehend-nlp
+# Public variable to be set by the user in the Makefile
+TARGET_DSS_VERSION=7.0
+
+# Private variables to be set by the user in the environment
+ifndef DKU_PLUGIN_DEVELOPER_ORG
+$(error the DKU_PLUGIN_DEVELOPER_ORG environment variable is not set)
+endif
+ifndef DKU_PLUGIN_DEVELOPER_TOKEN
+$(error the DKU_PLUGIN_DEVELOPER_TOKEN environment variable is not set)
+endif
+ifndef DKU_PLUGIN_DEVELOPER_REPO_URL
+$(error the DKU_PLUGIN_DEVELOPER_REPO_URL environment variable is not set)
+endif
+
+# evaluate additional variable
+plugin_id=`cat plugin.json | python -c "import sys, json; print(str(json.load(sys.stdin)['id']).replace('/',''))"`
+plugin_version=`cat plugin.json | python -c "import sys, json; print(str(json.load(sys.stdin)['version']).replace('/',''))"`
+archive_file_name="dss-plugin_${plugin_id}_${plugin_version}.zip"
+artifact_repo_target="${DKU_PLUGIN_DEVELOPER_REPO_URL}/${TARGET_DSS_VERSION}/${DKU_PLUGIN_DEVELOPER_ORG}/${plugin_id}/${plugin_version}/${archive_file_name}"
+remote_url=`git config --get remote.origin.url`
+last_commit_id=`git rev-parse HEAD`
+
 
 plugin:
-	cat plugin.json|json_pp > /dev/null
+	@echo "[START] Archiving plugin to dist/ folder..."
+	@cat plugin.json | json_pp > /dev/null
+	@rm -rf dist
+	@mkdir dist
+	@echo "{\"remote_url\":\"${remote_url}\",\"last_commit_id\":\"${last_commit_id}\"}" > release_info.json
+	@git archive -v -9 --format zip -o dist/${archive_file_name} HEAD
+	@zip -u dist/${archive_file_name} release_info.json
+	@rm release_info.json
+	@echo "[SUCCESS] Archiving plugin to dist/ folder: Done!"
+
+submit: plugin
+	@echo "[START] Publishing archive to artifact repository..."
+	@curl -H "Authorization: Bearer ${DKU_PLUGIN_DEVELOPER_TOKEN}>" -X PUT ${artifact_repo_target} -T dist/${archive_file_name}
+	@echo "[SUCCESS] Publishing archive to artifact repository: Done!"
+
+
+dist-clean:
 	rm -rf dist
-	mkdir dist
-	zip --exclude "*.pyc" -r dist/dss-plugin-${PLUGIN_ID}-${PLUGIN_VERSION}.zip plugin.json python-lib custom-recipes parameter-sets code-env
