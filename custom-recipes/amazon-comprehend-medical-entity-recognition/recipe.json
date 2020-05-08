@@ -121,6 +121,17 @@
             ]
         },
         {
+            "name": "minimum_score",
+            "label": "Minimum score",
+            "description": "Minimum confidence score (from 0 to 1) for the medical entity to be recognized",
+            "visibilityCondition": "model.expert == true",
+            "type": "DOUBLE",
+            "mandatory": true,
+            "defaultValue": 0,
+            "minD": 0,
+            "maxD": 1
+        },
+        {
             "name": "error_handling",
             "label": "API error handling",
             "type": "SELECT",

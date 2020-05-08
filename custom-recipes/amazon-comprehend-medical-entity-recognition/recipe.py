@@ -29,11 +29,13 @@ api_configuration_preset = get_recipe_config().get("api_configuration_preset")
 api_quota_rate_limit = api_configuration_preset.get("api_quota_rate_limit")
 api_quota_period = api_configuration_preset.get("api_quota_period")
 parallel_workers = api_configuration_preset.get("parallel_workers")
-batch_size = api_configuration_preset.get("batch_size")
 text_column = get_recipe_config().get("text_column")
 entity_types = [
     MedicalEntityTypeEnum[i] for i in get_recipe_config().get("entity_types", [])
 ]
+minimum_score = float(get_recipe_config().get("minimum_score", 0))
+if minimum_score < 0 or minimum_score > 1:
+    raise ValueError("Minimum confidence score must be between 0 and 1")
 error_handling = ErrorHandlingEnum[get_recipe_config().get("error_handling")]
 
 input_dataset_name = get_input_names_for_role("input_dataset")[0]
@@ -70,7 +72,6 @@ df = api_parallelizer(
     api_call_function=call_api_medical_entity_recognition,
     text_column=text_column,
     parallel_workers=parallel_workers,
-    batch_size=batch_size,
     error_handling=error_handling,
     column_prefix=column_prefix,
 )
@@ -78,6 +79,7 @@ df = api_parallelizer(
 api_formatter = MedicalEntityAPIFormatter(
     input_df=input_df,
     entity_types=entity_types,
+    minimum_score=minimum_score,
     column_prefix=column_prefix,
     error_handling=error_handling,
 )

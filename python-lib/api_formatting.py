@@ -79,10 +79,12 @@ class MedicalPhiAPIFormatter:
     def __init__(
         self,
         input_df: pd.DataFrame,
+        minimum_score: float,
         column_prefix: AnyStr = "medical_phi_api",
         error_handling: ErrorHandlingEnum = ErrorHandlingEnum.LOG,
     ):
         self.input_df = input_df
+        self.minimum_score = float(minimum_score)
         self.column_prefix = column_prefix
         self.error_handling = error_handling
         self.api_column_names = build_unique_column_names(input_df, column_prefix)
@@ -120,6 +122,7 @@ class MedicalPhiAPIFormatter:
                 e.get("Text", "")
                 for e in entities
                 if e.get("Type", "") == entity_enum.name
+                and float(e.get("Score", 0)) >= self.minimum_score
             ]
             if len(row[entity_type_column]) == 0:
                 row[entity_type_column] = ""
@@ -145,11 +148,13 @@ class MedicalEntityAPIFormatter:
         self,
         input_df: pd.DataFrame,
         entity_types: List,
+        minimum_score: float,
         column_prefix: AnyStr = "medical_entity_api",
         error_handling: ErrorHandlingEnum = ErrorHandlingEnum.LOG,
     ):
         self.input_df = input_df
         self.entity_types = entity_types
+        self.minimum_score = float(minimum_score)
         self.column_prefix = column_prefix
         self.error_handling = error_handling
         self.api_column_names = build_unique_column_names(input_df, column_prefix)
@@ -187,6 +192,7 @@ class MedicalEntityAPIFormatter:
                 e.get("Text", "")
                 for e in entities
                 if e.get("Category", "") == entity_enum.name
+                and float(e.get("Score", 0)) >= self.minimum_score
             ]
             if len(row[entity_type_column]) == 0:
                 row[entity_type_column] = ""
