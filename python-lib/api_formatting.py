@@ -68,7 +68,41 @@ def get_client(api_configuration_preset, service_name: AnyStr):
     return client
 
 
-class MedicalPhiAPIFormatter:
+class GenericAPIFormatter:
+    """
+    Geric Formatter class for API responses:
+    - initialize with generic parameters
+    - compute generic column descriptions
+    - apply format_row to dataframe
+    """
+
+    def __init__(
+        self,
+        input_df: pd.DataFrame,
+        column_prefix: AnyStr = "api",
+        error_handling: ErrorHandlingEnum = ErrorHandlingEnum.LOG,
+    ):
+        self.input_df = input_df
+        self.column_prefix = column_prefix
+        self.error_handling = error_handling
+        self.api_column_names = build_unique_column_names(input_df, column_prefix)
+        self.column_description_dict = {
+            v: API_COLUMN_NAMES_DESCRIPTION_DICT[k]
+            for k, v in self.api_column_names._asdict().items()
+        }
+
+    def format_row(self, row: Dict) -> Dict:
+        return row
+
+    def format_df(self, df: pd.DataFrame) -> pd.DataFrame:
+        logging.info("Formatting API results...")
+        df = df.apply(func=self.format_row, axis=1)
+        df = move_api_columns_to_end(df, self.api_column_names)
+        logging.info("Formatting API results: Done.")
+        return df
+
+
+class MedicalPhiAPIFormatter(GenericAPIFormatter):
     """
     Formatter class for Protected Health Information API responses:
     - make sure response is valid JSON
@@ -83,30 +117,22 @@ class MedicalPhiAPIFormatter:
         column_prefix: AnyStr = "medical_phi_api",
         error_handling: ErrorHandlingEnum = ErrorHandlingEnum.LOG,
     ):
-        self.input_df = input_df
+        super().__init__(input_df, column_prefix, error_handling)
         self.minimum_score = float(minimum_score)
-        self.column_prefix = column_prefix
-        self.error_handling = error_handling
-        self.api_column_names = build_unique_column_names(input_df, column_prefix)
-        self.column_description_dict = self._compute_column_description()
+        self._compute_column_description()
 
     def _compute_column_description(self):
-        column_description_dict = {
-            v: API_COLUMN_NAMES_DESCRIPTION_DICT[k]
-            for k, v in self.api_column_names._asdict().items()
-        }
         for entity_enum in MedicalPHITypeEnum:
             entity_type_column = generate_unique(
                 "entity_type_" + str(entity_enum.value).lower() + "_text",
                 self.input_df.keys(),
                 self.column_prefix,
             )
-            column_description_dict[
+            self.column_description_dict[
                 entity_type_column
             ] = "List of '{}' PHI entities extracted by the API".format(
                 str(entity_enum.value)
             )
-        return column_description_dict
 
     def format_row(self, row: Dict) -> Dict:
         raw_response = row[self.api_column_names.response]
@@ -128,15 +154,8 @@ class MedicalPhiAPIFormatter:
                 row[entity_type_column] = ""
         return row
 
-    def format_df(self, df: pd.DataFrame) -> pd.DataFrame:
-        logging.info("Formatting API results...")
-        df = df.apply(func=self.format_row, axis=1)
-        df = move_api_columns_to_end(df, self.api_column_names)
-        logging.info("Formatting API results: Done.")
-        return df
 
-
-class MedicalEntityAPIFormatter:
+class MedicalEntityAPIFormatter(GenericAPIFormatter):
     """
     Formatter class for Medical Entity Recognition API responses:
     - make sure response is valid JSON
@@ -152,31 +171,23 @@ class MedicalEntityAPIFormatter:
         column_prefix: AnyStr = "medical_entity_api",
         error_handling: ErrorHandlingEnum = ErrorHandlingEnum.LOG,
     ):
-        self.input_df = input_df
+        super().__init__(input_df, column_prefix, error_handling)
         self.entity_types = entity_types
         self.minimum_score = float(minimum_score)
-        self.column_prefix = column_prefix
-        self.error_handling = error_handling
-        self.api_column_names = build_unique_column_names(input_df, column_prefix)
-        self.column_description_dict = self._compute_column_description()
+        self._compute_column_description()
 
     def _compute_column_description(self):
-        column_description_dict = {
-            v: API_COLUMN_NAMES_DESCRIPTION_DICT[k]
-            for k, v in self.api_column_names._asdict().items()
-        }
         for entity_enum in MedicalEntityTypeEnum:
             entity_type_column = generate_unique(
                 "entity_type_" + str(entity_enum.value).lower() + "_text",
                 self.input_df.keys(),
                 self.column_prefix,
             )
-            column_description_dict[
+            self.column_description_dict[
                 entity_type_column
             ] = "List of '{}' medical entities extracted by the API".format(
                 str(entity_enum.value)
             )
-        return column_description_dict
 
     def format_row(self, row: Dict) -> Dict:
         raw_response = row[self.api_column_names.response]
@@ -197,10 +208,3 @@ class MedicalEntityAPIFormatter:
             if len(row[entity_type_column]) == 0:
                 row[entity_type_column] = ""
         return row
-
-    def format_df(self, df: pd.DataFrame) -> pd.DataFrame:
-        logging.info("Formatting API results...")
-        df = df.apply(func=self.format_row, axis=1)
-        df = move_api_columns_to_end(df, self.api_column_names)
-        logging.info("Formatting API results: Done.")
-        return df
