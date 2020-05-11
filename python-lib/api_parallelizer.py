@@ -12,7 +12,7 @@ from more_itertools import chunked, flatten
 from tqdm.auto import tqdm as tqdm_auto
 
 from plugin_io_utils import COLUMN_PREFIX, ErrorHandlingEnum, build_unique_column_names
-from api_formatting import (
+from dku_amazon_comprehend_medical import (
     API_EXCEPTIONS,
     API_SUPPORT_BATCH,
     BATCH_RESULT_KEY,
