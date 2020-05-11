@@ -18,7 +18,11 @@ from dataiku.customrecipe import (
     get_input_names_for_role,
     get_output_names_for_role,
 )
-from api_formatting import get_client, MedicalEntityTypeEnum, MedicalEntityAPIFormatter
+from dku_amazon_comprehend_medical import (
+    get_client,
+    MedicalEntityTypeEnum,
+    MedicalEntityAPIFormatter,
+)
 
 
 # ==============================================================================
