@@ -1,5 +1,5 @@
 {
-    "id": "amazon-comprehend-medical",
+    "id": "amazon-comprehend-nlp-medical",
     "version": "1.0.0",
     "meta": {
         "label": "Amazon Comprehend Medical",
