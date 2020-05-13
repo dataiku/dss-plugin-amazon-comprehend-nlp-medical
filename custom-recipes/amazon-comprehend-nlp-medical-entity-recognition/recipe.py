@@ -6,23 +6,23 @@ from retry import retry
 from ratelimit import limits, RateLimitException
 
 import dataiku
+from dataiku.customrecipe import (
+    get_recipe_config,
+    get_input_names_for_role,
+    get_output_names_for_role,
+)
 
 from plugin_io_utils import (
     ErrorHandlingEnum,
     validate_column_input,
     set_column_description,
 )
-from api_parallelizer import api_parallelizer
-from dataiku.customrecipe import (
-    get_recipe_config,
-    get_input_names_for_role,
-    get_output_names_for_role,
-)
-from dku_amazon_comprehend_medical import (
-    get_client,
+from amazon_comprehend_medical_api_formatting import (
     MedicalEntityTypeEnum,
     MedicalEntityAPIFormatter,
 )
+from amazon_comprehend_medical_api_client import API_EXCEPTIONS, get_client
+from api_parallelizer import api_parallelizer
 
 
 # ==============================================================================
@@ -52,7 +52,7 @@ output_dataset_name = get_output_names_for_role("output_dataset")[0]
 output_dataset = dataiku.Dataset(output_dataset_name)
 
 input_df = input_dataset.get_dataframe()
-client = get_client(api_configuration_preset, "comprehendmedical")
+client = get_client(api_configuration_preset)
 column_prefix = "medical_entity_api"
 
 
@@ -74,6 +74,7 @@ def call_api_medical_entity_recognition(row: Dict, text_column: AnyStr) -> Dict:
 df = api_parallelizer(
     input_df=input_df,
     api_call_function=call_api_medical_entity_recognition,
+    api_exceptions=API_EXCEPTIONS,
     text_column=text_column,
     parallel_workers=parallel_workers,
     error_handling=error_handling,

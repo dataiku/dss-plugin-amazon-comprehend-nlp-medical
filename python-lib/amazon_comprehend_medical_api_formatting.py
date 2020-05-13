@@ -4,9 +4,6 @@ from typing import AnyStr, Dict, List
 from enum import Enum
 
 import pandas as pd
-import boto3
-from boto3.exceptions import Boto3Error
-from botocore.exceptions import BotoCoreError, ClientError
 
 from plugin_io_utils import (
     API_COLUMN_NAMES_DESCRIPTION_DICT,
@@ -21,17 +18,6 @@ from plugin_io_utils import (
 # ==============================================================================
 # CONSTANT DEFINITION
 # ==============================================================================
-
-API_EXCEPTIONS = (Boto3Error, BotoCoreError, ClientError)
-
-API_SUPPORT_BATCH = False
-BATCH_RESULT_KEY = None
-BATCH_ERROR_KEY = None
-BATCH_INDEX_KEY = None
-BATCH_ERROR_MESSAGE_KEY = None
-BATCH_ERROR_TYPE_KEY = None
-
-VERBOSE = False
 
 
 class MedicalEntityTypeEnum(Enum):
@@ -55,17 +41,6 @@ class MedicalPHITypeEnum(Enum):
 # ==============================================================================
 # CLASS AND FUNCTION DEFINITION
 # ==============================================================================
-
-
-def get_client(api_configuration_preset, service_name: AnyStr):
-    client = boto3.client(
-        service_name=service_name,
-        aws_access_key_id=api_configuration_preset.get("aws_access_key"),
-        aws_secret_access_key=api_configuration_preset.get("aws_secret_key"),
-        region_name=api_configuration_preset.get("aws_region"),
-    )
-    logging.info("Credentials loaded")
-    return client
 
 
 class GenericAPIFormatter:

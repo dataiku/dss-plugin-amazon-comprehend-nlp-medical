@@ -11,25 +11,17 @@ import pandas as pd
 from more_itertools import chunked, flatten
 from tqdm.auto import tqdm as tqdm_auto
 
-from plugin_io_utils import COLUMN_PREFIX, ErrorHandlingEnum, build_unique_column_names
-from dku_amazon_comprehend_medical import (
-    API_EXCEPTIONS,
-    API_SUPPORT_BATCH,
-    BATCH_RESULT_KEY,
-    BATCH_ERROR_KEY,
-    BATCH_INDEX_KEY,
-    BATCH_ERROR_MESSAGE_KEY,
-    BATCH_ERROR_TYPE_KEY,
-    VERBOSE,
-)
+from plugin_io_utils import ErrorHandlingEnum, build_unique_column_names
 
 
 # ==============================================================================
 # CONSTANT DEFINITION
 # ==============================================================================
 
-PARALLEL_WORKERS = 4
-BATCH_SIZE = 10
+DEFAULT_PARALLEL_WORKERS = 4
+DEFAULT_BATCH_SIZE = 10
+DEFAULT_API_SUPPORT_BATCH = False
+DEFAULT_VERBOSE = False
 
 
 # ==============================================================================
@@ -41,9 +33,9 @@ def api_call_single_row(
     api_call_function: Callable,
     api_column_names: NamedTuple,
     row: Dict,
-    api_exceptions: Union[Exception, Tuple[Exception]] = API_EXCEPTIONS,
+    api_exceptions: Union[Exception, Tuple[Exception]],
     error_handling: ErrorHandlingEnum = ErrorHandlingEnum.LOG,
-    verbose: bool = VERBOSE,
+    verbose: bool = DEFAULT_VERBOSE,
     **api_call_function_kwargs
 ) -> Dict:
     """
@@ -79,14 +71,14 @@ def api_call_batch(
     api_call_function: Callable,
     api_column_names: NamedTuple,
     batch: List[Dict],
-    batch_result_key: AnyStr = BATCH_RESULT_KEY,
-    batch_error_key: AnyStr = BATCH_ERROR_KEY,
-    batch_index_key: AnyStr = BATCH_INDEX_KEY,
-    batch_error_message_key: AnyStr = BATCH_ERROR_MESSAGE_KEY,
-    batch_error_type_key: AnyStr = BATCH_ERROR_TYPE_KEY,
-    api_exceptions: Union[Exception, Tuple[Exception]] = API_EXCEPTIONS,
+    batch_result_key: AnyStr,
+    batch_error_key: AnyStr,
+    batch_index_key: AnyStr,
+    batch_error_message_key: AnyStr,
+    batch_error_type_key: AnyStr,
+    api_exceptions: Union[Exception, Tuple[Exception]],
     error_handling: ErrorHandlingEnum = ErrorHandlingEnum.LOG,
-    verbose: bool = VERBOSE,
+    verbose: bool = DEFAULT_VERBOSE,
     **api_call_function_kwargs
 ) -> List[Dict]:
     """
@@ -150,7 +142,7 @@ def convert_api_results_to_df(
     api_results: List[Dict],
     api_column_names: NamedTuple,
     error_handling: ErrorHandlingEnum = ErrorHandlingEnum.LOG,
-    verbose: bool = VERBOSE,
+    verbose: bool = DEFAULT_VERBOSE,
 ) -> pd.DataFrame:
     """
     Helper function to the "api_parallelizer" main function.
@@ -186,13 +178,13 @@ def convert_api_results_to_df(
 def api_parallelizer(
     input_df: pd.DataFrame,
     api_call_function: Callable,
-    parallel_workers: int = PARALLEL_WORKERS,
-    api_support_batch: bool = API_SUPPORT_BATCH,
-    batch_size: int = BATCH_SIZE,
+    api_exceptions: Union[Exception, Tuple[Exception]],
+    column_prefix: AnyStr,
+    parallel_workers: int = DEFAULT_PARALLEL_WORKERS,
+    api_support_batch: bool = DEFAULT_API_SUPPORT_BATCH,
+    batch_size: int = DEFAULT_BATCH_SIZE,
     error_handling: ErrorHandlingEnum = ErrorHandlingEnum.LOG,
-    column_prefix: AnyStr = COLUMN_PREFIX,
-    api_exceptions: Union[Exception, Tuple[Exception]] = API_EXCEPTIONS,
-    verbose: bool = VERBOSE,
+    verbose: bool = DEFAULT_VERBOSE,
     **api_call_function_kwargs
 ) -> pd.DataFrame:
     """
