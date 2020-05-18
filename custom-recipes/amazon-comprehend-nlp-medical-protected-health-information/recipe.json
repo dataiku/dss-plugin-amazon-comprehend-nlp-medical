@@ -92,7 +92,7 @@
         },
         {
             "name": "error_handling",
-            "label": "API error handling",
+            "label": "Error handling",
             "type": "SELECT",
             "visibilityCondition": "model.expert == true",
             "selectChoices": [
