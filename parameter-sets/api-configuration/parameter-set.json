@@ -56,7 +56,7 @@
             "description": "Maximum number of requests per period for one DSS activity. Reduce for concurrent activities.",
             "type": "INT",
             "mandatory": true,
-            "defaultValue": 20,
+            "defaultValue": 5,
             "minI": 1
         },
         {
