@@ -111,8 +111,12 @@ def api_call_batch(
             for i in range(len(batch)):
                 for k in api_column_names:
                     batch[i][k] = ""
-                result = [r for r in results if r.get(batch_index_key) == i]
-                error = [r for r in errors if r.get(batch_index_key) == i]
+                result = [
+                    r for r in results if str(int(r.get(batch_index_key))) == str(i)
+                ]
+                error = [
+                    r for r in errors if str(int(r.get(batch_index_key))) == str(i)
+                ]
                 if len(result) != 0:
                     # result must be json serializable
                     batch[i][api_column_names.response] = json.dumps(result[0])
