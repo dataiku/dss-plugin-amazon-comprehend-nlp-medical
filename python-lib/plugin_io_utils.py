@@ -114,7 +114,7 @@ def move_api_columns_to_end(
     Move non-human-readable API columns to the end of the dataframe
     """
     api_column_names_dict = api_column_names._asdict()
-    if "error_raw" not in df.keys():
+    if not any(["error_raw" in k for k in df.keys()]):
         api_column_names_dict.pop("error_raw", None)
     cols = [c for c in df.keys() if c not in api_column_names_dict.values()]
     new_cols = cols + list(api_column_names_dict.values())
