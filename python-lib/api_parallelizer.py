@@ -122,13 +122,13 @@ def api_call_batch(
                     batch[i][api_column_names.response] = json.dumps(result[0])
                 if len(error) != 0:
                     logging.warning(str(error))
-                    batch[i][api_column_names.error_message] = error.get(
+                    batch[i][api_column_names.error_message] = error[0].get(
                         batch_error_message_key, ""
                     )
-                    batch[i][api_column_names.error_type] = error.get(
+                    batch[i][api_column_names.error_type] = error[0].get(
                         batch_error_type_key, ""
                     )
-                    batch[i][api_column_names.error_raw] = str(error)
+                    batch[i][api_column_names.error_raw] = str(error[0])
         except api_exceptions as e:
             logging.warning(str(e))
             module = str(inspect.getmodule(e).__name__)
