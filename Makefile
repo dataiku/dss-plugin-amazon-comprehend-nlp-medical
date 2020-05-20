@@ -15,7 +15,7 @@ endif
 # evaluate additional variable
 plugin_id=`cat plugin.json | python -c "import sys, json; print(str(json.load(sys.stdin)['id']).replace('/',''))"`
 plugin_version=`cat plugin.json | python -c "import sys, json; print(str(json.load(sys.stdin)['version']).replace('/',''))"`
-archive_file_name="dss-plugin_${plugin_id}_${plugin_version}.zip"
+archive_file_name="dss-plugin-${plugin_id}-${plugin_version}.zip"
 artifact_repo_target="${DKU_PLUGIN_DEVELOPER_REPO_URL}/${TARGET_DSS_VERSION}/${DKU_PLUGIN_DEVELOPER_ORG}/${plugin_id}/${plugin_version}/${archive_file_name}"
 remote_url=`git config --get remote.origin.url`
 last_commit_id=`git rev-parse HEAD`
