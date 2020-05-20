@@ -28,9 +28,7 @@ COLUMN_PREFIX = "api"
 # CLASS AND FUNCTION DEFINITION
 # ==============================================================================
 
-ApiColumnNameTuple = namedtuple(
-    "ApiColumnNameTuple", API_COLUMN_NAMES_DESCRIPTION_DICT.keys()
-)
+ApiColumnNameTuple = namedtuple("ApiColumnNameTuple", API_COLUMN_NAMES_DESCRIPTION_DICT.keys())
 
 
 class ErrorHandlingEnum(Enum):
@@ -38,9 +36,7 @@ class ErrorHandlingEnum(Enum):
     FAIL = "Fail"
 
 
-def generate_unique(
-    name: AnyStr, existing_names: List, prefix: AnyStr = COLUMN_PREFIX
-) -> AnyStr:
+def generate_unique(name: AnyStr, existing_names: List, prefix: AnyStr = COLUMN_PREFIX) -> AnyStr:
     """
     Generate a unique name among existing ones by suffixing a number.
     Can also add an optional prefix.
@@ -56,27 +52,20 @@ def generate_unique(
     raise Exception("Failed to generated a unique name")
 
 
-def build_unique_column_names(
-    existing_names: List[AnyStr], column_prefix: AnyStr = COLUMN_PREFIX
-) -> NamedTuple:
+def build_unique_column_names(existing_names: List[AnyStr], column_prefix: AnyStr = COLUMN_PREFIX) -> NamedTuple:
     """
     Helper function to the "api_parallelizer" main function.
     Initializes a named tuple of column names from ApiColumnNameTuple,
     adding a prefix and a number suffix to make them unique.
     """
     api_column_names = ApiColumnNameTuple(
-        *[
-            generate_unique(k, existing_names, column_prefix)
-            for k in ApiColumnNameTuple._fields
-        ]
+        *[generate_unique(k, existing_names, column_prefix) for k in ApiColumnNameTuple._fields]
     )
     return api_column_names
 
 
 def safe_json_loads(
-    str_to_check: AnyStr,
-    error_handling: ErrorHandlingEnum = ErrorHandlingEnum.LOG,
-    verbose: bool = False,
+    str_to_check: AnyStr, error_handling: ErrorHandlingEnum = ErrorHandlingEnum.LOG, verbose: bool = False,
 ) -> Dict:
     """
     Wrap json.loads with an additional parameter to handle errors:
@@ -102,18 +91,19 @@ def validate_column_input(column_name: AnyStr, column_list: List[AnyStr]) -> Non
     if column_name is None or len(column_name) == 0:
         raise ValueError("You must specify a valid column name.")
     if column_name not in column_list:
-        raise ValueError(
-            "Column '{}' is not present in the input dataset.".format(column_name)
-        )
+        raise ValueError("Column '{}' is not present in the input dataset.".format(column_name))
 
 
 def move_api_columns_to_end(
-    df: pd.DataFrame, api_column_names: NamedTuple,
+    df: pd.DataFrame, api_column_names: NamedTuple, error_handling: ErrorHandlingEnum = ErrorHandlingEnum.LOG
 ) -> pd.DataFrame:
     """
     Move non-human-readable API columns to the end of the dataframe
     """
     api_column_names_dict = api_column_names._asdict()
+    if error_handling == ErrorHandlingEnum.FAIL:
+        api_column_names_dict.pop("error_message", None)
+        api_column_names_dict.pop("error_type", None)
     if not any(["error_raw" in k for k in df.keys()]):
         api_column_names_dict.pop("error_raw", None)
     cols = [c for c in df.keys() if c not in api_column_names_dict.values()]
@@ -123,9 +113,7 @@ def move_api_columns_to_end(
 
 
 def set_column_description(
-    input_dataset: dataiku.Dataset,
-    output_dataset: dataiku.Dataset,
-    column_description_dict: Dict,
+    input_dataset: dataiku.Dataset, output_dataset: dataiku.Dataset, column_description_dict: Dict,
 ) -> None:
     """
     Set column descriptions of the output dataset based on a dictionary of column descriptions

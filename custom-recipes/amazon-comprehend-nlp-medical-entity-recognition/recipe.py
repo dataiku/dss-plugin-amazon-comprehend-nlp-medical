@@ -6,21 +6,10 @@ from retry import retry
 from ratelimit import limits, RateLimitException
 
 import dataiku
-from dataiku.customrecipe import (
-    get_recipe_config,
-    get_input_names_for_role,
-    get_output_names_for_role,
-)
+from dataiku.customrecipe import get_recipe_config, get_input_names_for_role, get_output_names_for_role
 
-from plugin_io_utils import (
-    ErrorHandlingEnum,
-    validate_column_input,
-    set_column_description,
-)
-from amazon_comprehend_medical_api_formatting import (
-    MedicalEntityTypeEnum,
-    MedicalEntityAPIFormatter,
-)
+from plugin_io_utils import ErrorHandlingEnum, validate_column_input, set_column_description
+from amazon_comprehend_medical_api_formatting import MedicalEntityTypeEnum, MedicalEntityAPIFormatter
 from amazon_comprehend_medical_api_client import API_EXCEPTIONS, get_client
 from api_parallelizer import api_parallelizer
 
@@ -34,9 +23,7 @@ api_quota_rate_limit = api_configuration_preset.get("api_quota_rate_limit")
 api_quota_period = api_configuration_preset.get("api_quota_period")
 parallel_workers = api_configuration_preset.get("parallel_workers")
 text_column = get_recipe_config().get("text_column")
-entity_types = [
-    MedicalEntityTypeEnum[i] for i in get_recipe_config().get("entity_types", [])
-]
+entity_types = [MedicalEntityTypeEnum[i] for i in get_recipe_config().get("entity_types", [])]
 minimum_score = float(get_recipe_config().get("minimum_score", 0))
 if minimum_score < 0 or minimum_score > 1:
     raise ValueError("Minimum confidence score must be between 0 and 1")

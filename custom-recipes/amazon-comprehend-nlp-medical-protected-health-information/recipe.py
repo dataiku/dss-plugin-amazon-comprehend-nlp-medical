@@ -6,20 +6,12 @@ from retry import retry
 from ratelimit import limits, RateLimitException
 
 import dataiku
-from dataiku.customrecipe import (
-    get_recipe_config,
-    get_input_names_for_role,
-    get_output_names_for_role,
-)
+from dataiku.customrecipe import get_recipe_config, get_input_names_for_role, get_output_names_for_role
 
-from plugin_io_utils import (
-    ErrorHandlingEnum,
-    validate_column_input,
-    set_column_description,
-)
+from plugin_io_utils import ErrorHandlingEnum, validate_column_input, set_column_description
+from amazon_comprehend_medical_api_formatting import MedicalPhiAPIFormatter
 from amazon_comprehend_medical_api_client import API_EXCEPTIONS, get_client
 from api_parallelizer import api_parallelizer
-from amazon_comprehend_medical_api_formatting import MedicalPhiAPIFormatter
 
 
 # ==============================================================================
@@ -76,10 +68,7 @@ df = api_parallelizer(
 )
 
 api_formatter = MedicalPhiAPIFormatter(
-    input_df=input_df,
-    minimum_score=minimum_score,
-    column_prefix=column_prefix,
-    error_handling=error_handling,
+    input_df=input_df, minimum_score=minimum_score, column_prefix=column_prefix, error_handling=error_handling,
 )
 output_df = api_formatter.format_df(df)
 

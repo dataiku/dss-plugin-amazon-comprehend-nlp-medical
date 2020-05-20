@@ -62,8 +62,7 @@ class GenericAPIFormatter:
         self.error_handling = error_handling
         self.api_column_names = build_unique_column_names(input_df, column_prefix)
         self.column_description_dict = {
-            v: API_COLUMN_NAMES_DESCRIPTION_DICT[k]
-            for k, v in self.api_column_names._asdict().items()
+            v: API_COLUMN_NAMES_DESCRIPTION_DICT[k] for k, v in self.api_column_names._asdict().items()
         }
 
     def format_row(self, row: Dict) -> Dict:
@@ -72,7 +71,7 @@ class GenericAPIFormatter:
     def format_df(self, df: pd.DataFrame) -> pd.DataFrame:
         logging.info("Formatting API results...")
         df = df.apply(func=self.format_row, axis=1)
-        df = move_api_columns_to_end(df, self.api_column_names)
+        df = move_api_columns_to_end(df, self.api_column_names, self.error_handling)
         logging.info("Formatting API results: Done.")
         return df
 
@@ -99,13 +98,9 @@ class MedicalPhiAPIFormatter(GenericAPIFormatter):
     def _compute_column_description(self):
         for entity_enum in MedicalPHITypeEnum:
             entity_type_column = generate_unique(
-                "entity_type_" + str(entity_enum.value).lower() + "_text",
-                self.input_df.keys(),
-                self.column_prefix,
+                "entity_type_" + str(entity_enum.value).lower() + "_text", self.input_df.keys(), self.column_prefix,
             )
-            self.column_description_dict[
-                entity_type_column
-            ] = "List of '{}' PHI entities extracted by the API".format(
+            self.column_description_dict[entity_type_column] = "List of '{}' PHI entities extracted by the API".format(
                 str(entity_enum.value)
             )
 
@@ -115,15 +110,12 @@ class MedicalPhiAPIFormatter(GenericAPIFormatter):
         entities = response.get("Entities", [])
         for entity_enum in MedicalPHITypeEnum:
             entity_type_column = generate_unique(
-                "entity_type_" + str(entity_enum.value).lower() + "_text",
-                row.keys(),
-                self.column_prefix,
+                "entity_type_" + str(entity_enum.value).lower() + "_text", row.keys(), self.column_prefix,
             )
             row[entity_type_column] = [
                 e.get("Text", "")
                 for e in entities
-                if e.get("Type", "") == entity_enum.name
-                and float(e.get("Score", 0)) >= self.minimum_score
+                if e.get("Type", "") == entity_enum.name and float(e.get("Score", 0)) >= self.minimum_score
             ]
             if len(row[entity_type_column]) == 0:
                 row[entity_type_column] = ""
@@ -154,15 +146,11 @@ class MedicalEntityAPIFormatter(GenericAPIFormatter):
     def _compute_column_description(self):
         for entity_enum in MedicalEntityTypeEnum:
             entity_type_column = generate_unique(
-                "entity_type_" + str(entity_enum.value).lower() + "_text",
-                self.input_df.keys(),
-                self.column_prefix,
+                "entity_type_" + str(entity_enum.value).lower() + "_text", self.input_df.keys(), self.column_prefix,
             )
             self.column_description_dict[
                 entity_type_column
-            ] = "List of '{}' medical entities extracted by the API".format(
-                str(entity_enum.value)
-            )
+            ] = "List of '{}' medical entities extracted by the API".format(str(entity_enum.value))
 
     def format_row(self, row: Dict) -> Dict:
         raw_response = row[self.api_column_names.response]
@@ -170,15 +158,12 @@ class MedicalEntityAPIFormatter(GenericAPIFormatter):
         entities = response.get("Entities", [])
         for entity_enum in MedicalEntityTypeEnum:
             entity_type_column = generate_unique(
-                "entity_type_" + str(entity_enum.value).lower() + "_text",
-                row.keys(),
-                self.column_prefix,
+                "entity_type_" + str(entity_enum.value).lower() + "_text", row.keys(), self.column_prefix,
             )
             row[entity_type_column] = [
                 e.get("Text", "")
                 for e in entities
-                if e.get("Category", "") == entity_enum.name
-                and float(e.get("Score", 0)) >= self.minimum_score
+                if e.get("Category", "") == entity_enum.name and float(e.get("Score", 0)) >= self.minimum_score
             ]
             if len(row[entity_type_column]) == 0:
                 row[entity_type_column] = ""
