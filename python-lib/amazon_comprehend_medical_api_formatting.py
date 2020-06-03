@@ -30,9 +30,10 @@ class MedicalEntityTypeEnum(Enum):
 
 
 class MedicalPHITypeEnum(Enum):
+    ADDRESS = "Address"
     AGE = "Age"
     DATE = "Date"
-    NAME = "Mame"
+    NAME = "Name"
     PHONE_OR_FAX = "Phone or fax"
     EMAIL = "Email"
     ID = "ID"
@@ -108,7 +109,12 @@ class MedicalPhiAPIFormatter(GenericAPIFormatter):
         raw_response = row[self.api_column_names.response]
         response = safe_json_loads(raw_response, self.error_handling)
         entities = response.get("Entities", [])
-        discarded_entities = [e for e in entities if float(e.get("Score", 0)) < self.minimum_score]
+        discarded_entities = [
+            e
+            for e in entities
+            if float(e.get("Score", 0)) < self.minimum_score
+            and e.get("Type", "") in [e.name for e in MedicalEntityTypeEnum]
+        ]
         if len(discarded_entities) != 0:
             logging.info("Discarding {} entities below the minimum score threshold".format(len(discarded_entities)))
         for entity_enum in MedicalPHITypeEnum:
@@ -159,7 +165,12 @@ class MedicalEntityAPIFormatter(GenericAPIFormatter):
         raw_response = row[self.api_column_names.response]
         response = safe_json_loads(raw_response, self.error_handling)
         entities = response.get("Entities", [])
-        discarded_entities = [e for e in entities if float(e.get("Score", 0)) < self.minimum_score]
+        discarded_entities = [
+            e
+            for e in entities
+            if float(e.get("Score", 0)) < self.minimum_score
+            and e.get("Category", "") in [e.name for e in MedicalEntityTypeEnum]
+        ]
         if len(discarded_entities) != 0:
             logging.info("Discarding {} entities below the minimum score threshold".format(len(discarded_entities)))
         for entity_enum in MedicalEntityTypeEnum:
