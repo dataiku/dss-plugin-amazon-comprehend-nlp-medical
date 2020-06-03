@@ -108,6 +108,9 @@ class MedicalPhiAPIFormatter(GenericAPIFormatter):
         raw_response = row[self.api_column_names.response]
         response = safe_json_loads(raw_response, self.error_handling)
         entities = response.get("Entities", [])
+        discarded_entities = [e for e in entities if float(e.get("Score", 0)) < self.minimum_score]
+        if len(discarded_entities) != 0:
+            logging.info("Discarding {} entities below the minimum score threshold".format(len(discarded_entities)))
         for entity_enum in MedicalPHITypeEnum:
             entity_type_column = generate_unique(
                 "entity_type_" + str(entity_enum.value).lower() + "_text", row.keys(), self.column_prefix,
@@ -119,9 +122,6 @@ class MedicalPhiAPIFormatter(GenericAPIFormatter):
             ]
             if len(row[entity_type_column]) == 0:
                 row[entity_type_column] = ""
-            discarded_entities = [e for e in entities if float(e.get("Score", 0)) < self.minimum_score]
-            if len(discarded_entities) != 0:
-                logging.info("Discarding {} entities below the minimum score threshold".format(len(discarded_entities)))
         return row
 
 
@@ -159,6 +159,9 @@ class MedicalEntityAPIFormatter(GenericAPIFormatter):
         raw_response = row[self.api_column_names.response]
         response = safe_json_loads(raw_response, self.error_handling)
         entities = response.get("Entities", [])
+        discarded_entities = [e for e in entities if float(e.get("Score", 0)) < self.minimum_score]
+        if len(discarded_entities) != 0:
+            logging.info("Discarding {} entities below the minimum score threshold".format(len(discarded_entities)))
         for entity_enum in MedicalEntityTypeEnum:
             entity_type_column = generate_unique(
                 "entity_type_" + str(entity_enum.value).lower() + "_text", row.keys(), self.column_prefix,
@@ -170,7 +173,4 @@ class MedicalEntityAPIFormatter(GenericAPIFormatter):
             ]
             if len(row[entity_type_column]) == 0:
                 row[entity_type_column] = ""
-                discarded_entities = [e for e in entities if float(e.get("Score", 0)) < self.minimum_score]
-            if len(discarded_entities) != 0:
-                logging.info("Discarding {} entities below the minimum score threshold".format(len(discarded_entities)))
         return row
