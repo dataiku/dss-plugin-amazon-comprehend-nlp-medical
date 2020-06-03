@@ -1,0 +1,114 @@
+{
+    "meta": {
+        "label": "Protected Health Information Extraction",
+        "description": "Extract Protected Health Information (PHI) in a medical text record",
+        "icon": "icon-amazon-comprehend icon-cloud",
+        "displayOrderRank": 1
+    },
+    "kind": "PYTHON",
+    "inputRoles": [
+        {
+            "name": "input_dataset",
+            "label": "Input Dataset",
+            "description": "Dataset containing the text data to analyze",
+            "arity": "UNARY",
+            "required": true,
+            "acceptsDataset": true
+        }
+    ],
+    "outputRoles": [
+        {
+            "name": "output_dataset",
+            "label": "Output dataset",
+            "description": "Dataset with enriched output",
+            "arity": "UNARY",
+            "required": true,
+            "acceptsDataset": true
+        }
+    ],
+    "params": [
+        {
+            "name": "separator_input",
+            "label": "Input Parameters",
+            "type": "SEPARATOR"
+        },
+        {
+            "name": "text_column",
+            "label": "Text column",
+            "type": "COLUMN",
+            "columnRole": "input_dataset",
+            "mandatory": true,
+            "allowedColumnTypes": [
+                "string"
+            ]
+        },
+        {
+            "name": "language",
+            "label": "Language",
+            "description": "Only supported language",
+            "type": "SELECT",
+            "mandatory": true,
+            "selectChoices": [
+                {
+                    "value": "en",
+                    "label": "English"
+                }
+            ],
+            "defaultValue": "en"
+        },
+        {
+            "name": "separator_configuration",
+            "label": "Configuration",
+            "type": "SEPARATOR"
+        },
+        {
+            "name": "api_configuration_preset",
+            "label": "API configuration preset",
+            "type": "PRESET",
+            "parameterSetId": "api-configuration",
+            "mandatory": true
+        },
+        {
+            "name": "separator_advanced",
+            "label": "Advanced",
+            "type": "SEPARATOR"
+        },
+        {
+            "name": "expert",
+            "label": "Expert mode",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
+            "name": "minimum_score",
+            "label": "Minimum score",
+            "description": "Minimum confidence score (from 0 to 1) for the PHI to be extracted",
+            "visibilityCondition": "model.expert == true",
+            "type": "DOUBLE",
+            "mandatory": true,
+            "defaultValue": 0,
+            "minD": 0,
+            "maxD": 1
+        },
+        {
+            "name": "error_handling",
+            "label": "Error handling",
+            "type": "SELECT",
+            "visibilityCondition": "model.expert == true",
+            "selectChoices": [
+                {
+                    "value": "FAIL",
+                    "label": "Fail"
+                },
+                {
+                    "value": "LOG",
+                    "label": "Log"
+                }
+            ],
+            "defaultValue": "LOG",
+            "mandatory": true,
+            "description": "Log API errors to the output or fail with an exception on any API error"
+        }
+    ],
+    "resourceKeys": []
+}
