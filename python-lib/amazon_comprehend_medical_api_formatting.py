@@ -119,6 +119,9 @@ class MedicalPhiAPIFormatter(GenericAPIFormatter):
             ]
             if len(row[entity_type_column]) == 0:
                 row[entity_type_column] = ""
+            discarded_entities = [e for e in entities if float(e.get("Score", 0)) < self.minimum_score]
+            if len(discarded_entities) != 0:
+                logging.info("Discarding {} entities below the minimum score threshold".format(len(discarded_entities)))
         return row
 
 
@@ -167,4 +170,7 @@ class MedicalEntityAPIFormatter(GenericAPIFormatter):
             ]
             if len(row[entity_type_column]) == 0:
                 row[entity_type_column] = ""
+                discarded_entities = [e for e in entities if float(e.get("Score", 0)) < self.minimum_score]
+            if len(discarded_entities) != 0:
+                logging.info("Discarding {} entities below the minimum score threshold".format(len(discarded_entities)))
         return row
