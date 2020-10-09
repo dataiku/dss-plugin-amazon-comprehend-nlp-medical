@@ -83,7 +83,7 @@
             "name": "minimum_score",
             "label": "Minimum score",
             "description": "Minimum confidence score (from 0 to 1) for the PHI to be extracted",
-            "visibilityCondition": "model.expert == true",
+            "visibilityCondition": "model.expert",
             "type": "DOUBLE",
             "mandatory": true,
             "defaultValue": 0,
@@ -94,7 +94,7 @@
             "name": "error_handling",
             "label": "Error handling",
             "type": "SELECT",
-            "visibilityCondition": "model.expert == true",
+            "visibilityCondition": "model.expert",
             "selectChoices": [
                 {
                     "value": "FAIL",

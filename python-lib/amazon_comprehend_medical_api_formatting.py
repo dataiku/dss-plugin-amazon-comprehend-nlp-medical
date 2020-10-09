@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+"""Module with classes to format results from the Amazon Comprehend Medical API"""
+
 import logging
 from typing import AnyStr, Dict, List
 from enum import Enum
@@ -174,14 +176,15 @@ class MedicalEntityAPIFormatter(GenericAPIFormatter):
         if len(discarded_entities) != 0:
             logging.info("Discarding {} entities below the minimum score threshold".format(len(discarded_entities)))
         for entity_enum in MedicalEntityTypeEnum:
-            entity_type_column = generate_unique(
-                "entity_type_" + str(entity_enum.value).lower() + "_text", row.keys(), self.column_prefix,
-            )
-            row[entity_type_column] = [
-                e.get("Text", "")
-                for e in entities
-                if e.get("Category", "") == entity_enum.name and float(e.get("Score", 0)) >= self.minimum_score
-            ]
-            if len(row[entity_type_column]) == 0:
-                row[entity_type_column] = ""
+            if entity_enum in self.entity_types:
+                entity_type_column = generate_unique(
+                    "entity_type_" + str(entity_enum.value).lower() + "_text", row.keys(), self.column_prefix,
+                )
+                row[entity_type_column] = [
+                    e.get("Text", "")
+                    for e in entities
+                    if e.get("Category", "") == entity_enum.name and float(e.get("Score", 0)) >= self.minimum_score
+                ]
+                if len(row[entity_type_column]) == 0:
+                    row[entity_type_column] = ""
         return row

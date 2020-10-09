@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+"""Module with utility functions to call the Amazon Comprehend Medical API"""
+
 import logging
 
 import boto3

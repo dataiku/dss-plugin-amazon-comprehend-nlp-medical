@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
+"""Module with read/write utility functions which are *not* based on the Dataiku API"""
+
 import logging
 import json
-import pandas as pd
-import dataiku
-
 from enum import Enum
 from typing import AnyStr, List, NamedTuple, Dict
 from collections import OrderedDict, namedtuple
+
+import pandas as pd
 
 
 # ==============================================================================
 # CONSTANT DEFINITION
 # ==============================================================================
 
+COLUMN_PREFIX = "api"
 API_COLUMN_NAMES_DESCRIPTION_DICT = OrderedDict(
     [
         ("response", "Raw response from the API in JSON format"),
@@ -21,12 +23,6 @@ API_COLUMN_NAMES_DESCRIPTION_DICT = OrderedDict(
         ("error_raw", "Raw error from the API"),
     ]
 )
-COLUMN_PREFIX = "api"
-
-
-# ==============================================================================
-# CLASS AND FUNCTION DEFINITION
-# ==============================================================================
 
 ApiColumnNameTuple = namedtuple("ApiColumnNameTuple", API_COLUMN_NAMES_DESCRIPTION_DICT.keys())
 
@@ -36,10 +32,14 @@ class ErrorHandlingEnum(Enum):
     FAIL = "Fail"
 
 
+# ==============================================================================
+# CLASS AND FUNCTION DEFINITION
+# ==============================================================================
+
+
 def generate_unique(name: AnyStr, existing_names: List, prefix: AnyStr = COLUMN_PREFIX) -> AnyStr:
     """
-    Generate a unique name among existing ones by suffixing a number.
-    Can also add an optional prefix.
+    Generate a unique name among existing ones by suffixing a number. Can also add an optional prefix.
     """
     if prefix is not None:
         new_name = prefix + "_" + name
@@ -55,13 +55,22 @@ def generate_unique(name: AnyStr, existing_names: List, prefix: AnyStr = COLUMN_
 def build_unique_column_names(existing_names: List[AnyStr], column_prefix: AnyStr = COLUMN_PREFIX) -> NamedTuple:
     """
     Helper function to the "api_parallelizer" main function.
-    Initializes a named tuple of column names from ApiColumnNameTuple,
-    adding a prefix and a number suffix to make them unique.
+    Initializes a named tuple of column names from ApiColumnNameTuple, ensure columns are unique.
     """
     api_column_names = ApiColumnNameTuple(
         *[generate_unique(k, existing_names, column_prefix) for k in ApiColumnNameTuple._fields]
     )
     return api_column_names
+
+
+def validate_column_input(column_name: AnyStr, column_list: List[AnyStr]) -> None:
+    """
+    Validate that user input for column parameter is valid.
+    """
+    if column_name is None or len(column_name) == 0:
+        raise ValueError("You must specify a valid column name.")
+    if column_name not in column_list:
+        raise ValueError("Column '{}' is not present in the input dataset.".format(column_name))
 
 
 def safe_json_loads(
@@ -84,16 +93,6 @@ def safe_json_loads(
     return output
 
 
-def validate_column_input(column_name: AnyStr, column_list: List[AnyStr]) -> None:
-    """
-    Validate that user input for column parameter is valid.
-    """
-    if column_name is None or len(column_name) == 0:
-        raise ValueError("You must specify a valid column name.")
-    if column_name not in column_list:
-        raise ValueError("Column '{}' is not present in the input dataset.".format(column_name))
-
-
 def move_api_columns_to_end(
     df: pd.DataFrame, api_column_names: NamedTuple, error_handling: ErrorHandlingEnum = ErrorHandlingEnum.LOG
 ) -> pd.DataFrame:
@@ -110,27 +109,3 @@ def move_api_columns_to_end(
     new_cols = cols + list(api_column_names_dict.values())
     df = df.reindex(columns=new_cols)
     return df
-
-
-def set_column_description(
-    input_dataset: dataiku.Dataset, output_dataset: dataiku.Dataset, column_description_dict: Dict,
-) -> None:
-    """
-    Set column descriptions of the output dataset based on a dictionary of column descriptions
-    and retains the column descriptions from the input dataset if the column name matches
-    """
-    input_dataset_schema = input_dataset.read_schema()
-    output_dataset_schema = output_dataset.read_schema()
-    input_columns_names = [col["name"] for col in input_dataset_schema]
-    for output_col_info in output_dataset_schema:
-        output_col_name = output_col_info.get("name", "")
-        output_col_info["comment"] = column_description_dict.get(output_col_name)
-        if output_col_name in input_columns_names:
-            matched_comment = [
-                input_col_info.get("comment", "")
-                for input_col_info in input_dataset_schema
-                if input_col_info.get("name") == output_col_name
-            ]
-            if len(matched_comment) != 0:
-                output_col_info["comment"] = matched_comment[0]
-    output_dataset.write_schema(output_dataset_schema)
