@@ -8,7 +8,8 @@ from ratelimit import limits, RateLimitException
 import dataiku
 from dataiku.customrecipe import get_recipe_config, get_input_names_for_role, get_output_names_for_role
 
-from plugin_io_utils import ErrorHandlingEnum, validate_column_input, set_column_description
+from plugin_io_utils import ErrorHandlingEnum, validate_column_input
+from dku_io_utils import set_column_description
 from amazon_comprehend_medical_api_formatting import MedicalPhiAPIFormatter
 from amazon_comprehend_medical_api_client import API_EXCEPTIONS, get_client
 from api_parallelizer import api_parallelizer
@@ -37,7 +38,7 @@ validate_column_input(text_column, input_columns_names)
 output_dataset_name = get_output_names_for_role("output_dataset")[0]
 output_dataset = dataiku.Dataset(output_dataset_name)
 
-input_df = input_dataset.get_dataframe()
+input_df = input_dataset.get_dataframe(infer_with_pandas=False)
 client = get_client(api_configuration_preset)
 column_prefix = "medical_phi_api"
 

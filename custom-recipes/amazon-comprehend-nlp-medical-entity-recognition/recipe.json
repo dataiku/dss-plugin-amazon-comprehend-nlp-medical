@@ -69,22 +69,9 @@
             "mandatory": true
         },
         {
-            "name": "separator_advanced",
-            "label": "Advanced",
-            "type": "SEPARATOR"
-        },
-        {
-            "name": "expert",
-            "label": "Expert mode",
-            "type": "BOOLEAN",
-            "defaultValue": false
-        },
-        {
             "name": "entity_types",
             "label": "Entity types",
             "type": "MULTISELECT",
-            "visibilityCondition": "model.expert == true",
-            "description": "List of medical entity types to extract",
             "mandatory": true,
             "selectChoices": [
                 {
@@ -121,10 +108,21 @@
             ]
         },
         {
+            "name": "separator_advanced",
+            "label": "Advanced",
+            "type": "SEPARATOR"
+        },
+        {
+            "name": "expert",
+            "label": "Expert mode",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
             "name": "minimum_score",
             "label": "Minimum score",
             "description": "Minimum confidence score (from 0 to 1) for the medical entity to be recognized",
-            "visibilityCondition": "model.expert == true",
+            "visibilityCondition": "model.expert",
             "type": "DOUBLE",
             "mandatory": true,
             "defaultValue": 0,
@@ -135,7 +133,7 @@
             "name": "error_handling",
             "label": "Error handling",
             "type": "SELECT",
-            "visibilityCondition": "model.expert == true",
+            "visibilityCondition": "model.expert",
             "selectChoices": [
                 {
                     "value": "FAIL",

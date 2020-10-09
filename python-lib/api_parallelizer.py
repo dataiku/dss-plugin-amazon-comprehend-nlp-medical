@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+"""Module with functions to parallelize API calls with error handling"""
+
 import logging
 import inspect
 import math
-
 from typing import Callable, AnyStr, List, Tuple, NamedTuple, Dict, Union
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -58,10 +59,12 @@ def api_call_single_row(
             row[api_column_names.response] = response
         except api_exceptions as e:
             logging.warning(str(e))
-            module = str(inspect.getmodule(e).__name__)
-            error_name = str(type(e).__qualname__)
+            error_type = str(type(e).__qualname__)
+            module = inspect.getmodule(e)
+            if module is not None:
+                error_type = str(module.__name__) + "." + error_type
             row[api_column_names.error_message] = str(e)
-            row[api_column_names.error_type] = ".".join([module, error_name])
+            row[api_column_names.error_type] = error_type
             row[api_column_names.error_raw] = str(e.args)
     return row
 
@@ -98,12 +101,14 @@ def api_call_batch(
             batch = batch_api_response_parser(batch=batch, response=response, api_column_names=api_column_names)
         except api_exceptions as e:
             logging.warning(str(e))
-            module = str(inspect.getmodule(e).__name__)
-            error_name = str(type(e).__qualname__)
+            error_type = str(type(e).__qualname__)
+            module = inspect.getmodule(e)
+            if module is not None:
+                error_type = str(module.__name__) + "." + error_type
             for row in batch:
                 row[api_column_names.response] = ""
                 row[api_column_names.error_message] = str(e)
-                row[api_column_names.error_type] = ".".join([module, error_name])
+                row[api_column_names.error_type] = error_type
                 row[api_column_names.error_raw] = str(e.args)
     return batch
 
@@ -157,7 +162,7 @@ def api_parallelizer(
     """
     df_iterator = (i[1].to_dict() for i in input_df.iterrows())
     len_iterator = len(input_df.index)
-    log_msg = "Calling remote API endpoint with {} rows".format(len_iterator)
+    log_msg = "Calling remote API endpoint with {} rows...".format(len_iterator)
     if api_support_batch:
         log_msg += ", chunked by {}".format(batch_size)
         df_iterator = chunked(df_iterator, batch_size)
