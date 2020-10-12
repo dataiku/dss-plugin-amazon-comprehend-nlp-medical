@@ -36,9 +36,11 @@ class MedicalPHITypeEnum(Enum):
     AGE = "Age"
     DATE = "Date"
     NAME = "Name"
-    PHONE_OR_FAX = "Phone or fax"
+    PHONE_OR_FAX = "Phone_or_fax"
     EMAIL = "Email"
     ID = "ID"
+    URL = "URL"
+    PROFESSION = "Profession"
 
 
 # ==============================================================================
