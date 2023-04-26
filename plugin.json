@@ -1,6 +1,6 @@
 {
     "id": "amazon-comprehend-nlp-medical",
-    "version": "1.0.2",
+    "version": "1.1.0",
     "meta": {
         "label": "Amazon Comprehend Medical",
         "category": "Natural Language Processing",
