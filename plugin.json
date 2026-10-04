@@ -1,6 +1,6 @@
 {
     "id": "amazon-comprehend-nlp-medical",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "meta": {
         "label": "Amazon Comprehend Medical",
         "category": "Natural Language Processing",
@@ -8,7 +8,7 @@
         "author": "Dataiku (Alex COMBESSIE)",
         "icon": "icon-amazon-comprehend icon-cloud",
         "licenseInfo": "Apache Software License",
-        "url": "https://www.dataiku.com/product/plugins/amazon-comprehend-nlp-medical/",
+        "url": "https://doc.dataiku.com/dss/latest/nlp/amazon-comprehend-nlp-medical.html",
         "tags": [
             "AWS",
             "Cloud",

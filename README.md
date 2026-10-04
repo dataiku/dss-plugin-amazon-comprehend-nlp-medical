@@ -4,7 +4,7 @@
 
 This Dataiku DSS plugin provides several recipes to call the [Amazon Comprehend Medical APIs](https://aws.amazon.com/comprehend/medical/).
 
-Documentation: https://www.dataiku.com/product/plugins/amazon-comprehend-nlp-medical/
+Documentation: https://doc.dataiku.com/dss/latest/nlp/amazon-comprehend-nlp-medical.html
 
 ### License
 
